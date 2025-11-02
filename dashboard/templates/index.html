@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Monitor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header-refresh {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .refresh-time {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .header-refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .endpoint-cell {
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+            color: #495057;
+            max-width: 400px;
+            word-break: break-all;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-redirect {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-client-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-server-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-error {
+            background: #d6d8db;
+            color: #383d41;
+        }
+
+        .ssl-ok {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .ssl-warning {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .ssl-critical {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .ssl-expired {
+            color: #721c24;
+            font-weight: 700;
+        }
+
+        .time-ago {
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+
+        .no-data {
+            color: #adb5bd;
+            font-style: italic;
+        }
+
+        .refresh-info {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-refresh">
+                <div class="refresh-time">Last refreshed: {{ current_time }}</div>
+                <button class="header-refresh-btn" onclick="location.reload()">↻ Refresh</button>
+            </div>
+            <h1>🔍 Endpoint Monitor Dashboard</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_endpoints }}</div>
+                    <div class="stat-label">Total Endpoints</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ healthy_count }}</div>
+                    <div class="stat-label">Healthy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ ssl_warning_count }}</div>
+                    <div class="stat-label">SSL Expiring Soon</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Endpoint</th>
+                        <th>Status</th>
+                        <th>SSL Expiration</th>
+                        <th>Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for endpoint in endpoints %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="endpoint-cell">{{ endpoint.endpoint }}</td>
+                        <td><span class="status-badge {{ endpoint.status_class }}">{{ endpoint.status_text }}</span></td>
+                        <td class="{{ endpoint.ssl_class }}">{{ endpoint.ssl_text }}</td>
+                        <td class="time-ago">{{ endpoint.update_text }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="refresh-info">
+            Last refreshed: {{ current_time }}
+            <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh every 60 seconds
+        setTimeout(() => location.reload(), 60000);
+    </script>
+</body>
+</html>
