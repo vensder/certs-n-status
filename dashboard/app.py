@@ -255,6 +255,6 @@ def api_endpoints(request):
 
 
 if __name__ == "__main__":
-    print("Starting Endpoint Monitor Dashboard...")
+    print("Starting CertsNStatus...")
     print("Access the dashboard at: http://localhost:5000")
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CertsNStatus</title>
+    <title>CertsNStatus (Go)</title>
     <style>
         * {
             margin: 0;
@@ -236,21 +236,21 @@
     <div class="container">
         <div class="header">
             <div class="header-refresh">
-                <div class="refresh-time">Last refreshed: {{ current_time }}</div>
+                <div class="refresh-time">Last refreshed: {{.CurrentTime}}</div>
                 <button class="header-refresh-btn" onclick="location.reload()">↻ Refresh</button>
             </div>
-            <h1>🔍 CertsNStatus</h1>
+            <h1>🔍 CertsNStatus (Go)</h1>
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-value">{{ total_endpoints }}</div>
+                    <div class="stat-value">{{.TotalEndpoints}}</div>
                     <div class="stat-label">Total Endpoints</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">{{ healthy_count }}</div>
+                    <div class="stat-value">{{.HealthyCount}}</div>
                     <div class="stat-label">Healthy</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">{{ ssl_warning_count }}</div>
+                    <div class="stat-value">{{.SSLWarningCount}}</div>
                     <div class="stat-label">SSL Expiring Soon</div>
                 </div>
             </div>
@@ -268,21 +268,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for endpoint in endpoints %}
+                    {{range $index, $endpoint := .Endpoints}}
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td class="endpoint-cell">{{ endpoint.endpoint }}</td>
-                        <td><span class="status-badge {{ endpoint.status_class }}">{{ endpoint.status_text }}</span></td>
-                        <td class="{{ endpoint.ssl_class }}">{{ endpoint.ssl_text }}</td>
-                        <td class="time-ago">{{ endpoint.update_text }}</td>
+                        <td>{{add $index 1}}</td>
+                        <td class="endpoint-cell">{{$endpoint.Endpoint}}</td>
+                        <td><span class="status-badge {{$endpoint.StatusClass}}">{{$endpoint.StatusText}}</span></td>
+                        <td class="{{$endpoint.SSLClass}}">{{$endpoint.SSLText}}</td>
+                        <td class="time-ago">{{$endpoint.UpdateText}}</td>
                     </tr>
-                    {% endfor %}
+                    {{end}}
                 </tbody>
             </table>
         </div>
 
         <div class="refresh-info">
-            Last refreshed: {{ current_time }}
+            Last refreshed: {{.CurrentTime}}
             <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
         </div>
     </div>
