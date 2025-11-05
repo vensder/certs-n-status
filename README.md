@@ -20,6 +20,10 @@ It’s designed for simplicity and self-hosting, featuring:
 
 This project is created for **self-education** and to explore **GitLab CI/CD**, containerization, and lightweight service design.
 
+## Screenshots
+
+![CertsNStatus Dashboard](screenshots/dashboard.png)
+
 ---
 
 💡 _Future plans:_  
