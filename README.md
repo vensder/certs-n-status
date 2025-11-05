@@ -6,13 +6,13 @@ It’s designed for simplicity and self-hosting, featuring:
 - 🔍 Periodic HTTP status checks (e.g. every minute)
 - 🔒 SSL certificate expiration checks (e.g. hourly)
 - 💾 Status caching in Redis
-- 🌐 Simple web dashboard (built with Python Bottle)
+- 🌐 Simple web dashboards (built with Python Microdot an Golang)
 - 🔔 Optional alerts via Slack or other webhooks
 
 ## Project Structure (DRAFT)
 
 - **checker/** – services performing HTTP and SSL checks  
-- **web/** – Bottle-based web dashboard  
+- **web/** – Microdot-based web dashboard
 - **notifier/** – optional Slack/webhook integration  
 - **redis/** – data store for latest results  
 

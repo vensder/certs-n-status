@@ -1,6 +1,8 @@
 https://google.com
 https://github.com
 example.com
+http://localhost:5000/
+https://localhost:8080/
 # This is a comment
 http://httpbin.org/status/200
 https://httpbin.org/status/404
