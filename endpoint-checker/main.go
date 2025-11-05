@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	// "errors"
 	"fmt"
 	"log"
+	// "net"
 	"net/http"
 	"os"
 	"strings"
@@ -89,7 +91,12 @@ func (ec *EndpointChecker) loadEndpoints() ([]string, error) {
 func (ec *EndpointChecker) checkHTTPStatus(url string) (int, error) {
 	resp, err := ec.httpClient.Get(url)
 	if err != nil {
-		return 0, err
+		// Check if it's a DNS resolution error
+		if strings.Contains(err.Error(), "no such host") ||
+			strings.Contains(err.Error(), "lookup") {
+			return -1, err // DNS resolution error
+		}
+		return 0, err // Other network errors
 	}
 	defer resp.Body.Close()
 	return resp.StatusCode, nil
@@ -156,15 +163,25 @@ func (ec *EndpointChecker) storeSSLExpiration(url string, expiration time.Time) 
 func (ec *EndpointChecker) checkEndpointStatus(url string) {
 	statusCode, err := ec.checkHTTPStatus(url)
 	if err != nil {
-		log.Printf("[ERROR] Failed to check status for %s: %v", url, err)
-		// Store error code as 0
-		statusCode = 0
+		if statusCode == -1 {
+			log.Printf("[WARN] DNS resolution failed for %s: %v", url, err)
+		} else {
+			log.Printf("[ERROR] Failed to check status for %s: %v", url, err)
+			// Store error code as 0 for other network errors
+			statusCode = 0
+		}
 	}
 
 	if err := ec.storeHTTPStatus(url, statusCode); err != nil {
 		log.Printf("[ERROR] Failed to store status for %s: %v", url, err)
 	} else {
-		log.Printf("[INFO] Status check: %s -> %d", url, statusCode)
+		if statusCode == -1 {
+			log.Printf("[INFO] Status check: %s -> DNS_ERROR (-1)", url)
+		} else if statusCode == 0 {
+			log.Printf("[INFO] Status check: %s -> NETWORK_ERROR (0)", url)
+		} else {
+			log.Printf("[INFO] Status check: %s -> %d", url, statusCode)
+		}
 	}
 }
 

@@ -251,3 +251,4 @@ go.work.sum
 # .idea/
 # .vscode/
 
+*.kate-swp

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CertsNStatus</title>
+    <title>Endpoint Monitor Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -176,6 +176,17 @@
             color: #383d41;
         }
 
+        .status-dns-error {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .status-unknown {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
         .ssl-ok {
             color: #28a745;
             font-weight: 600;
@@ -239,7 +250,7 @@
                 <div class="refresh-time">Last refreshed: {{ current_time }}</div>
                 <button class="header-refresh-btn" onclick="location.reload()">↻ Refresh</button>
             </div>
-            <h1>🔍 CertsNStatus</h1>
+            <h1>🔍 Endpoint Monitor Dashboard</h1>
             <div class="stats">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_endpoints }}</div>
